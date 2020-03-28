@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import {Route, Switch, withRouter} from 'react-router-dom';
+import {Route, Switch, withRouter, Redirect} from 'react-router-dom';
 
 import Layout from './hoc/Layout/Layout';
 import BurgerBuilder from './containers/BurgerBuilder/BugerBuilder';
@@ -16,26 +16,45 @@ class App extends Component {
   }
 
   render() {
+    let routes = (
+      <Switch>
+        <Route path="/" exact component={BurgerBuilder}/>
+        <Route path="/auth" component={Auth}/>
+        <Redirect to='/' />
+      </Switch>
+    );
+
+    if(this.props.isAuthenticated){
+      routes = (
+        <Switch>
+          <Route path="/" exact component={BurgerBuilder}/>
+          <Route path="/checkout" component={Checkout}/>
+          <Route path="/logout" component={Logout}/>
+          <Route path="/orders" component={Orders}/>
+          <Redirect to='/' />
+        </Switch>
+      );
+    }
     return (
       <div >
         <Layout>
-          <Switch>
-            <Route path="/checkout" component={Checkout}/>
-            <Route path="/" exact component={BurgerBuilder}/>
-            <Route path="/auth" component={Auth}/>
-            <Route path="/logout" component={Logout}/>
-            <Route path="/orders" component={Orders}/>
-          </Switch>
+          {routes}
         </Layout>
       </div>
     );
   }
 }
 
-const mapDispatchProps = dispatch => {
+const mapStateToProps = state => {
+  return {
+    isAuthenticated: state.auth.token !== null
+  }
+}
+
+const mapDispatchToProps = dispatch => {
   return{
     onTryAutoSignOut: () => dispatch(actions.authCheckstate())
   }
 }
 
-export default withRouter(connect(null, mapDispatchProps)(App));
+export default withRouter(connect(mapStateToProps, mapDispatchToProps)(App));

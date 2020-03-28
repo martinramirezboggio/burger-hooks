@@ -8,7 +8,6 @@ export const authStart = () => {
 };
 
 export const authSuccess = (idToken, userId) => {
-  console.log("[authSuccess] ===> userId", userId);
   return {
     type: actionTypes.AUTH_SUCCESS,
     idToken: idToken,
@@ -52,10 +51,10 @@ export const auth = ( email , password, isSignUp ) => {
         url = 'https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=AIzaSyDPGCSOvX-j5R0yUE0wWUr55Jj7vKspC_8';
     axios.post(url, authData)
       .then(response => {
-        console.log(response);
         const expirationDate = new Date(new Date().getTime() + response.data.expiresIn * 1000);
         localStorage.setItem('token', response.data.idToken);
         localStorage.setItem('expirationDate', expirationDate);
+        localStorage.setItem('userId', response.data.localId);
         dispatch(authSuccess(response.data.idToken, response.data.localId));
         dispatch(checkAuthTimeout(+response.data.expiresIn));
       })
@@ -65,19 +64,6 @@ export const auth = ( email , password, isSignUp ) => {
       })
   }
 };
-
-const getUserData = (token) => {
-  const url = 'https://identitytoolkit.googleapis.com/v1/accounts:lookup?key=AIzaSyDPGCSOvX-j5R0yUE0wWUr55Jj7vKspC_8';
-  let userId = '';
-  axios.post(url,{idToken: token})
-    .then(response => {
-      userId = response.data.users[0].localId;
-    })
-    .catch(error => {
-      console.log("[get User data error] =>",error);
-    })
-  return userId;
-}
 
 export const setAuthRedirectPath = path => {
   return {
@@ -96,9 +82,9 @@ export const authCheckstate = () => {
       if(expirationDate <= new Date()) {
         dispatch(logout());
       }else {
-        const userId = getUserData(token);
+        const userId = localStorage.getItem('userId');
         dispatch(authSuccess(token, userId));
-        dispatch(checkAuthTimeout((expirationDate.getTime() - new Date().getTime()) / 1000) ) ;
+        dispatch(checkAuthTimeout((expirationDate.getTime() - new Date().getTime()) / 1000));
       }
     }
   }

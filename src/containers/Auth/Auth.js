@@ -137,11 +137,12 @@ class Auth extends Component {
           {authRedirect}
           {errorMessage}
           {form}
-          <Button buttonType="Success">Submit</Button>
+          <Button buttonType="Success" >Submit</Button>
           <Button buttonType="Danger" clicked={this.switchAuthModeHandler}>
             Switch to {this.state.isSignUp?"Signin" : "Signup"}
           </Button>
         </form>
+
       </div>
     );
   }
