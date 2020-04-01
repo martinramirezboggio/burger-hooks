@@ -63,7 +63,6 @@ const burgerBuilder = (state = initialState, action)=>{
     case actionTypes.FETCH_INGREDIENTS_FAILED: return fetchIngredientsFail(state, action);
     default: return state;
   }
-  return state;
 };
 
 export default burgerBuilder;
